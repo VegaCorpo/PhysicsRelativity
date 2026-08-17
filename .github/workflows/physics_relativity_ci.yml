@@ -1,0 +1,22 @@
+name:  Physics relativity CI
+
+on:
+  push:
+    branches-ignore: [ga-ignore-*]
+  pull_request:
+    branches-ignore: [ga-ignore-*]
+
+permissions:
+  contents: write
+
+jobs:
+  check-compilation:
+    uses: ./.github/workflows/check_compilation.yml
+
+  dispatch:
+    needs: [check-compilation]
+    uses: ./.github/workflows/dispatch.yml
+    with:
+      repository: VegaCorpo/OrbitalEngine
+    secrets:
+      PAT: ${{ secrets.PAT }}

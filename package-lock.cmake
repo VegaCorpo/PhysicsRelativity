@@ -1,0 +1,44 @@
+# Eigen
+CPMDeclarePackage(Eigen
+        GIT_TAG 5.0.1
+        GITLAB_REPOSITORY libeigen/eigen
+        SYSTEM YES
+        EXCLUDE_FROM_ALL YES
+)
+
+#entt
+CPMDeclarePackage(EnTT
+    GIT_TAG v3.16.0
+    GITHUB_REPOSITORY skypjack/entt
+    SYSTEM YES
+    EXCLUDE_FROM_ALL YES
+)
+
+# Common
+CPMDeclarePackage(Common
+        GIT_TAG v0.1.2
+        GITHUB_REPOSITORY VegaCorpo/Common
+        SYSTEM YES
+        EXCLUDE_FROM_ALL YES
+)
+
+CPMDeclarePackage(TBB
+        GIT_TAG v2022.3.0
+        GITHUB_REPOSITORY uxlfoundation/oneTBB
+        SYSTEM YES
+        EXCLUDE_FROM_ALL YES
+)
+
+# boost
+CPMDeclarePackage(Boost
+        URL https://github.com/boostorg/boost/releases/download/boost-1.89.0/boost-1.89.0-cmake.tar.gz
+        SYSTEM YES
+        EXCLUDE_FROM_ALL YES
+)
+
+# Google Benchmark
+# CPMAddPackage(Benchmark
+#     GITHUB_REPOSITORY google/benchmark
+#     GIT_TAG v1.9.5
+#     OPTIONS "BENCHMARK_ENABLE_GTEST_TESTS OFF"
+# )
