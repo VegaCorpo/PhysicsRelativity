@@ -1,4 +1,4 @@
-name:  Physics relativity CI
+name: continous-integration
 
 on:
   push:
@@ -12,6 +12,8 @@ permissions:
 jobs:
   check-compilation:
     uses: ./.github/workflows/check_compilation.yml
+    with:
+      executable: liborbital_physics_relativity.so
 
   dispatch:
     needs: [check-compilation]

@@ -44,10 +44,13 @@ if(CMAKE_BUILD_TYPE STREQUAL "Asan")
     endif()
 endif()
 
-add_library(orbital_physics_relativity INTERFACE)
+add_library(orbital_physics_relativity SHARED
+    src/PhysicsAPI.cpp
+    src/RelativityPhysics.cpp
+)
 
 if(WIN32)
-    target_compile_definitions(orbital_physics_relativity INTERFACE NOGDI NOUSER WIN32_LEAN_AND_MEAN)
+    target_compile_definitions(orbital_physics_relativity PRIVATE NOGDI NOUSER WIN32_LEAN_AND_MEAN)
 
     set(PROJECT_DIR ${CMAKE_SOURCE_DIR})
     set(BUILD_DIR ${CMAKE_BINARY_DIR})
@@ -56,7 +59,7 @@ if(WIN32)
     set(TARGET_DIR "${PROJECT_DIR}")
 endif()
 
-target_link_libraries(orbital_physics_relativity INTERFACE
+target_link_libraries(orbital_physics_relativity PRIVATE
     Eigen3::Eigen
     EnTT::EnTT
     Common
@@ -66,7 +69,7 @@ target_link_libraries(orbital_physics_relativity INTERFACE
     $<$<CONFIG:Debug>:TBB::tbb>
 )
 
-target_include_directories(orbital_physics_relativity INTERFACE
+target_include_directories(orbital_physics_relativity PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${Common_SOURCE_DIR}/include
 )
