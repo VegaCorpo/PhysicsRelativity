@@ -8,18 +8,18 @@ namespace physics {
             RelativityPhysics() = default;
             ~RelativityPhysics() override = default;
 
-            void init(common::WorldState world) override;
+            void init(common::SpecificDataPhysics world) override;
 
             void update(double dt) override;
 
             void shutdown() override;
 
-            void syncIn(common::WorldState world) override;
-            common::WorldState syncOut() override;
+            void syncIn(common::SpecificDataPhysics world) override;
+            common::SpecificDataPhysics syncOut() override;
 
             [[nodiscard]] std::string getName() const override { return "RelativityPhysics"; }
 
         private:
-            common::WorldState _worldState;
+            common::SpecificDataPhysics _worldState;
     };
 } // namespace physics
