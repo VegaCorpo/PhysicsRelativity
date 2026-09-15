@@ -15,7 +15,7 @@ namespace physics {
             void shutdown() override;
 
             void syncIn(common::SpecificDataPhysics world) override;
-            common::SpecificDataPhysics syncOut() override;
+            common::WorldState publish() override;
 
             [[nodiscard]] std::string getName() const override { return "RelativityPhysics"; }
 
