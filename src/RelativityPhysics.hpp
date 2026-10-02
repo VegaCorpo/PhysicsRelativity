@@ -20,6 +20,8 @@ namespace physics {
             [[nodiscard]] std::string getName() const override { return "RelativityPhysics"; }
 
         private:
+            void _publishOrientations(common::WorldState& world, std::size_t count) const;
+
             common::SpecificDataPhysics _worldState;
     };
 } // namespace physics
