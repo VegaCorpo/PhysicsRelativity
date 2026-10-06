@@ -12,6 +12,8 @@ void physics::RelativityPhysics::init(common::SpecificDataPhysics world)
 
 void physics::RelativityPhysics::update(double dt)
 {
+    if (this->_state != common::ModuleState::RUNNING)
+        return;
     common::rotation::advanceAll(this->_worldState.orientations, this->_worldState.angularVelocities, dt);
 }
 
@@ -26,8 +28,8 @@ void physics::RelativityPhysics::syncIn(common::SpecificDataPhysics world)
 common::WorldState physics::RelativityPhysics::publish()
 {
     const auto& src = this->_worldState;
-    const std::size_t count = std::min({src.entitiesId.size(), src.positions.size(),
-                                        src.velocities.size(), src.accelerations.size()});
+    const std::size_t count =
+        std::min({src.entitiesId.size(), src.positions.size(), src.velocities.size(), src.accelerations.size()});
 
     common::WorldState world;
     world.entitiesId.assign(src.entitiesId.begin(), src.entitiesId.begin() + count);
