@@ -2,6 +2,9 @@
 
 #include <interfaces/IPhysicsEngine.hpp>
 
+#include "components/RelativityState.hpp"
+#include "types/types.hpp"
+
 namespace physics {
     class RelativityPhysics : public common::IPhysicsEngine {
         public:
@@ -11,6 +14,10 @@ namespace physics {
             void init(common::SpecificDataPhysics world) override;
 
             void update(double dt) override;
+
+            void physicsPause() override { this->_state = common::ModuleState::PAUSE; };
+
+            void physicsResume() override { this->_state = common::ModuleState::RUNNING; };
 
             void shutdown() override;
 
@@ -23,5 +30,7 @@ namespace physics {
             void _publishOrientations(common::WorldState& world, std::size_t count) const;
 
             common::SpecificDataPhysics _worldState;
+            RelativisticState _relativisticState;
+            common::ModuleState _state = common::ModuleState::RUNNING;
     };
 } // namespace physics

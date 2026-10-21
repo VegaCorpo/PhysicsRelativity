@@ -3,20 +3,29 @@
 #include <algorithm>
 #include <cstddef>
 #include <utility>
-#include <utils/rotation.hpp>
+#include "utils/rotation.hpp"
+
+//? Public methods
 
 void physics::RelativityPhysics::init(common::SpecificDataPhysics world)
 {
     this->_worldState = std::move(world);
+    this->_relativisticState.syncIn(this->_worldState);
 }
 
 void physics::RelativityPhysics::update(double dt)
 {
+    if (this->_state != common::ModuleState::RUNNING)
+        return;
+    this->_relativisticState.syncIn(this->_worldState);
     common::rotation::advanceAll(this->_worldState.orientations, this->_worldState.angularVelocities, dt);
+    this->_relativisticState.syncOut(this->_worldState);
 }
 
 void physics::RelativityPhysics::shutdown()
 {}
+
+//? Private methods
 
 void physics::RelativityPhysics::syncIn(common::SpecificDataPhysics world)
 {
@@ -25,15 +34,21 @@ void physics::RelativityPhysics::syncIn(common::SpecificDataPhysics world)
 
 common::WorldState physics::RelativityPhysics::publish()
 {
-    const auto& src = this->_worldState;
-    const std::size_t count = std::min({src.entitiesId.size(), src.positions.size(),
-                                        src.velocities.size(), src.accelerations.size()});
-
     common::WorldState world;
-    world.entitiesId.assign(src.entitiesId.begin(), src.entitiesId.begin() + count);
-    world.positions.assign(src.positions.begin(), src.positions.begin() + count);
-    world.velocities.assign(src.velocities.begin(), src.velocities.begin() + count);
-    world.accelerations.assign(src.accelerations.begin(), src.accelerations.begin() + count);
+    const std::size_t count = std::min({this->_worldState.entitiesId.size(), this->_worldState.positions.size(),
+                                        this->_worldState.velocities.size(), this->_worldState.accelerations.size()});
+
+    world.entitiesId.resize(count);
+    world.positions.resize(count);
+    world.velocities.resize(count);
+    world.accelerations.resize(count);
+
+    for (std::size_t i = 0; i < count; ++i) {
+        world.entitiesId[i] = this->_worldState.entitiesId[i];
+        world.positions[i] = this->_worldState.positions[i];
+        world.velocities[i] = this->_worldState.velocities[i];
+        world.accelerations[i] = this->_worldState.accelerations[i];
+    }
     this->_publishOrientations(world, count);
     return world;
 }

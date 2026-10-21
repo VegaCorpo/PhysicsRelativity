@@ -47,6 +47,7 @@ endif()
 add_library(orbital_physics_relativity SHARED
     src/PhysicsAPI.cpp
     src/RelativityPhysics.cpp
+    src/utils/RelativityUtils.cpp
 )
 
 if(WIN32)
