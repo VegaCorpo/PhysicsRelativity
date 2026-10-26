@@ -1,5 +1,6 @@
 #pragma once
 
+#include <expected>
 #include <interfaces/IPhysicsEngine.hpp>
 
 #include "components/RelativityState.hpp"
@@ -27,7 +28,20 @@ namespace physics {
 
             [[nodiscard]] std::string getName() const override { return "RelativityPhysics"; }
 
+            [[nodiscard]] const std::vector<double>& lorentzFactors() const noexcept
+            {
+                return this->_relativisticState.lorentzFactor;
+            }
+
+            [[nodiscard]] const std::vector<double>& properTimes() const noexcept
+            {
+                return this->_relativisticState.properTime;
+            }
+
         private:
+            [[nodiscard]] bool
+            _canAdvance(const std::expected<integration::SubSteps, integration::TimeStepError>& subSteps) const;
+            void _advance(const integration::SubSteps& subSteps);
             void _publishOrientations(common::WorldState& world, std::size_t count) const;
 
             common::SpecificDataPhysics _worldState;

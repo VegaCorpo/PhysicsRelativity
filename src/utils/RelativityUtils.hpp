@@ -5,4 +5,7 @@ namespace physics::utils {
 
     /** @brief Convert coordinate time to proper time for a constant speed (km/s). */
     [[nodiscard]] double properTime(double coordinateTime, double speed);
+
+    /** @brief Minkowski interval squared using the (+---) sign convention (km²). */
+    [[nodiscard]] double minkowskiIntervalSquared(double deltaTime, double deltaX, double deltaY, double deltaZ);
 } // namespace physics::utils

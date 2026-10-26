@@ -15,17 +15,13 @@ void physics::RelativityPhysics::init(common::SpecificDataPhysics world)
 
 void physics::RelativityPhysics::update(double dt)
 {
-    if (this->_state != common::ModuleState::RUNNING)
+    const std::expected<integration::SubSteps, integration::TimeStepError> subSteps = this->_timeStep.split(dt);
+    if (!this->_canAdvance(subSteps))
         return;
-
-    const auto subSteps = this->_timeStep.split(dt);
-    if (!subSteps.has_value() || subSteps->empty())
-        return;
-
     this->_relativisticState.syncIn(this->_worldState);
-    for (std::size_t step = 0; step < subSteps->count; ++step)
-        common::rotation::advanceAll(this->_worldState.orientations, this->_worldState.angularVelocities,
-                                     subSteps->duration);
+    this->_advance(*subSteps);
+    common::rotation::advanceAll(this->_worldState.orientations, this->_worldState.angularVelocities, dt);
+
     this->_relativisticState.syncOut(this->_worldState);
 }
 
@@ -58,6 +54,18 @@ common::WorldState physics::RelativityPhysics::publish()
     }
     this->_publishOrientations(world, count);
     return world;
+}
+
+bool physics::RelativityPhysics::_canAdvance(
+    const std::expected<integration::SubSteps, integration::TimeStepError>& subSteps) const
+{
+    return this->_state == common::ModuleState::RUNNING && subSteps.has_value() && !subSteps->empty();
+}
+
+void physics::RelativityPhysics::_advance(const integration::SubSteps& subSteps)
+{
+    for (std::size_t stepIndex = 0; stepIndex < subSteps.count; stepIndex += 1)
+        this->_relativisticState.advanceProperTime(subSteps.duration);
 }
 
 void physics::RelativityPhysics::_publishOrientations(common::WorldState& world, std::size_t count) const
