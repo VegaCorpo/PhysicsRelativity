@@ -17,8 +17,15 @@ void physics::RelativityPhysics::update(double dt)
 {
     if (this->_state != common::ModuleState::RUNNING)
         return;
+
+    const auto subSteps = this->_timeStep.split(dt);
+    if (!subSteps.has_value() || subSteps->empty())
+        return;
+
     this->_relativisticState.syncIn(this->_worldState);
-    common::rotation::advanceAll(this->_worldState.orientations, this->_worldState.angularVelocities, dt);
+    for (std::size_t step = 0; step < subSteps->count; ++step)
+        common::rotation::advanceAll(this->_worldState.orientations, this->_worldState.angularVelocities,
+                                     subSteps->duration);
     this->_relativisticState.syncOut(this->_worldState);
 }
 

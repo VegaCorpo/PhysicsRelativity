@@ -3,6 +3,7 @@
 #include <interfaces/IPhysicsEngine.hpp>
 
 #include "components/RelativityState.hpp"
+#include "integration/TimeStep.hpp"
 #include "types/types.hpp"
 
 namespace physics {
@@ -31,6 +32,7 @@ namespace physics {
 
             common::SpecificDataPhysics _worldState;
             RelativisticState _relativisticState;
+            integration::TimeStep _timeStep;
             common::ModuleState _state = common::ModuleState::RUNNING;
     };
 } // namespace physics
