@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-project(orbital_physics_relativity LANGUAGES CXX)
+project(orbital_physics_relativity VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
@@ -72,4 +72,9 @@ target_link_libraries(orbital_physics_relativity PRIVATE
 target_include_directories(orbital_physics_relativity PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${Common_SOURCE_DIR}/include
+)
+
+target_compile_definitions(orbital_physics_relativity PRIVATE
+    ORBITAL_MODULE_NAME="${PROJECT_NAME}"
+    ORBITAL_MODULE_VERSION="${PROJECT_VERSION}"
 )
