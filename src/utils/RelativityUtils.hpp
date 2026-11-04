@@ -22,8 +22,22 @@ namespace physics::utils {
 
     enum class LorentzTransformError {
         NON_FINITE_INPUT,
-        SPEED_NOT_SUBLUMINAL
+        SPEED_NOT_SUBLUMINAL,
+        NON_FINITE_RESULT
     };
+
+    /** @brief Relativistic speed magnitude in km/s. */
+    [[nodiscard]] double speedMagnitude(const RelativeVelocity& velocity) noexcept;
+
+    /** @brief Checked Lorentz factor; rejects non-finite or luminal/superluminal speeds. */
+    [[nodiscard]] std::expected<double, LorentzTransformError> lorentzFactor(const RelativeVelocity& velocity);
+
+    /**
+     * @brief Transform a velocity measured in S into S', which moves at frameVelocity relative to S.
+     * This is the relativistic velocity composition law; all velocities are in km/s.
+     */
+    [[nodiscard]] std::expected<RelativeVelocity, LorentzTransformError>
+    transformVelocityToMovingFrame(const RelativeVelocity& velocity, const RelativeVelocity& frameVelocity);
 
     /** @brief Convert coordinate time to proper time for a constant speed (km/s). */
     [[nodiscard]] double properTime(double coordinateTime, double speed);

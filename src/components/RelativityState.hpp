@@ -62,12 +62,13 @@ namespace physics {
 
             [[nodiscard]] static double lorentzFactorFor(double vx, double vy, double vz)
             {
-                const double betaSquared = (vx * vx + vy * vy + vz * vz) / (SPEED_OF_LIGHT * SPEED_OF_LIGHT);
-                if (betaSquared == 1.0)
+                const double speed = std::hypot(vx, vy, vz);
+                if (speed == SPEED_OF_LIGHT)
                     return std::numeric_limits<double>::infinity();
-                if (!std::isfinite(betaSquared) || betaSquared > 1.0)
+                if (!std::isfinite(speed) || speed > SPEED_OF_LIGHT)
                     return std::numeric_limits<double>::quiet_NaN();
-                return 1.0 / std::sqrt(1.0 - betaSquared);
+                const double beta = speed / SPEED_OF_LIGHT;
+                return 1.0 / std::sqrt((1.0 - beta) * (1.0 + beta));
             }
 
             void syncOut(common::SpecificDataPhysics& world) const
