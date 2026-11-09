@@ -7,24 +7,20 @@ namespace physics::utils {
 
     /** @brief Spacetime event in the engine units: seconds and kilometres. */
     struct SpacetimeEvent {
-        double time = 0.0;
-        double x = 0.0;
-        double y = 0.0;
-        double z = 0.0;
+            double time = 0.0;
+            double x = 0.0;
+            double y = 0.0;
+            double z = 0.0;
     };
 
     /** @brief Three-dimensional relative velocity in km/s. */
     struct RelativeVelocity {
-        double x = 0.0;
-        double y = 0.0;
-        double z = 0.0;
+            double x = 0.0;
+            double y = 0.0;
+            double z = 0.0;
     };
 
-    enum class LorentzTransformError {
-        NON_FINITE_INPUT,
-        SPEED_NOT_SUBLUMINAL,
-        NON_FINITE_RESULT
-    };
+    enum class LorentzTransformError { NON_FINITE_INPUT, SPEED_NOT_SUBLUMINAL, NON_FINITE_RESULT };
 
     /** @brief Relativistic speed magnitude in km/s. */
     [[nodiscard]] double speedMagnitude(const RelativeVelocity& velocity) noexcept;

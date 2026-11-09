@@ -91,8 +91,7 @@ physics::utils::transformVelocityToMovingFrame(const RelativeVelocity& velocity,
     // Rounding can put a mathematically subluminal result one ULP at or above c.
     const double resultSpeed = speedMagnitude(result);
     if (resultSpeed >= RelativisticState::SPEED_OF_LIGHT) {
-        const double largestRepresentableSubluminalSpeed =
-            std::nextafter(RelativisticState::SPEED_OF_LIGHT, 0.0);
+        const double largestRepresentableSubluminalSpeed = std::nextafter(RelativisticState::SPEED_OF_LIGHT, 0.0);
         const double scale = largestRepresentableSubluminalSpeed / resultSpeed;
         result.x *= scale;
         result.y *= scale;
@@ -163,10 +162,9 @@ physics::utils::rotateSpatially(const physics::utils::SpacetimeEvent& event, dou
     const long double d = nx * event.x + ny * event.y + nz * event.z;
     const long double k = 1.0L - c;
 
-    SpacetimeEvent result{event.time,
-        static_cast<double>(event.x*c + (ny*event.z - nz*event.y)*s + nx*d*k),
-        static_cast<double>(event.y*c + (nz*event.x - nx*event.z)*s + ny*d*k),
-        static_cast<double>(event.z*c + (nx*event.y - ny*event.x)*s + nz*d*k)};
+    SpacetimeEvent result{event.time, static_cast<double>(event.x * c + (ny * event.z - nz * event.y) * s + nx * d * k),
+                          static_cast<double>(event.y * c + (nz * event.x - nx * event.z) * s + ny * d * k),
+                          static_cast<double>(event.z * c + (nx * event.y - ny * event.x) * s + nz * d * k)};
     if (!std::isfinite(result.x) || !std::isfinite(result.y) || !std::isfinite(result.z))
         return std::unexpected(LorentzTransformError::NON_FINITE_RESULT);
     return result;
