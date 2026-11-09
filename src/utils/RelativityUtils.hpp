@@ -51,4 +51,17 @@ namespace physics::utils {
      */
     [[nodiscard]] std::expected<SpacetimeEvent, LorentzTransformError>
     transformToMovingFrame(const SpacetimeEvent& event, const RelativeVelocity& frameVelocity);
+
+    /** Apply a proper spatial rotation (SO(3)) to an event; time is unchanged. */
+    [[nodiscard]] std::expected<SpacetimeEvent, LorentzTransformError>
+    rotateSpatially(const SpacetimeEvent& event, double angleRadians, const RelativeVelocity& axis);
+
+    /** Inverse of transformToMovingFrame for the same inertial frame. */
+    [[nodiscard]] std::expected<SpacetimeEvent, LorentzTransformError>
+    transformFromMovingFrame(const SpacetimeEvent& event, const RelativeVelocity& frameVelocity);
+
+    /** Transform S -> S' -> S'' by applying the two frame velocities in order. */
+    [[nodiscard]] std::expected<SpacetimeEvent, LorentzTransformError>
+    transformBetweenFrames(const SpacetimeEvent& event, const RelativeVelocity& firstFrameVelocity,
+                           const RelativeVelocity& secondFrameVelocity);
 } // namespace physics::utils

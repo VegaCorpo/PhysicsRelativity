@@ -144,3 +144,48 @@ physics::utils::transformToMovingFrame(const physics::utils::SpacetimeEvent& eve
         return std::unexpected(LorentzTransformError::NON_FINITE_RESULT);
     return transformed;
 }
+
+std::expected<physics::utils::SpacetimeEvent, physics::utils::LorentzTransformError>
+physics::utils::rotateSpatially(const physics::utils::SpacetimeEvent& event, double angleRadians,
+                                const physics::utils::RelativeVelocity& axis)
+{
+    if (!std::isfinite(event.time) || !std::isfinite(event.x) || !std::isfinite(event.y) || !std::isfinite(event.z) ||
+        !std::isfinite(angleRadians) || !isFinite(axis))
+        return std::unexpected(LorentzTransformError::NON_FINITE_INPUT);
+
+    const double norm = speedMagnitude(axis);
+    if (!(norm > 0.0))
+        return std::unexpected(LorentzTransformError::NON_FINITE_INPUT);
+
+    const long double nx = axis.x / norm, ny = axis.y / norm, nz = axis.z / norm;
+    const long double c = std::cos(static_cast<long double>(angleRadians));
+    const long double s = std::sin(static_cast<long double>(angleRadians));
+    const long double d = nx * event.x + ny * event.y + nz * event.z;
+    const long double k = 1.0L - c;
+
+    SpacetimeEvent result{event.time,
+        static_cast<double>(event.x*c + (ny*event.z - nz*event.y)*s + nx*d*k),
+        static_cast<double>(event.y*c + (nz*event.x - nx*event.z)*s + ny*d*k),
+        static_cast<double>(event.z*c + (nx*event.y - ny*event.x)*s + nz*d*k)};
+    if (!std::isfinite(result.x) || !std::isfinite(result.y) || !std::isfinite(result.z))
+        return std::unexpected(LorentzTransformError::NON_FINITE_RESULT);
+    return result;
+}
+
+std::expected<physics::utils::SpacetimeEvent, physics::utils::LorentzTransformError>
+physics::utils::transformFromMovingFrame(const physics::utils::SpacetimeEvent& event,
+                                         const physics::utils::RelativeVelocity& frameVelocity)
+{
+    return transformToMovingFrame(event, {-frameVelocity.x, -frameVelocity.y, -frameVelocity.z});
+}
+
+std::expected<physics::utils::SpacetimeEvent, physics::utils::LorentzTransformError>
+physics::utils::transformBetweenFrames(const physics::utils::SpacetimeEvent& event,
+                                       const physics::utils::RelativeVelocity& firstFrameVelocity,
+                                       const physics::utils::RelativeVelocity& secondFrameVelocity)
+{
+    auto intermediate = transformToMovingFrame(event, firstFrameVelocity);
+    if (!intermediate)
+        return std::unexpected(intermediate.error());
+    return transformToMovingFrame(*intermediate, secondFrameVelocity);
+}
