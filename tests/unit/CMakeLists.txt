@@ -1,0 +1,21 @@
+cmake_minimum_required(VERSION 3.14)
+project(orbital_physics_relativity_unit LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CPM_USE_LOCAL_PACKAGES ON)
+set(PHYSICS_RELATIVITY_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../.." CACHE PATH "Module source")
+include(${PHYSICS_RELATIVITY_SOURCE_DIR}/cmake/CPM.cmake)
+include(${PHYSICS_RELATIVITY_SOURCE_DIR}/package-lock.cmake)
+include(package-lock.cmake)
+CPMGetPackage("Common")
+CPMGetPackage("GTest")
+enable_testing()
+add_executable(physics_relativity_unit_tests
+    relativity_utils_test.cpp
+    ${PHYSICS_RELATIVITY_SOURCE_DIR}/src/utils/RelativityUtils.cpp)
+target_include_directories(physics_relativity_unit_tests PRIVATE ${PHYSICS_RELATIVITY_SOURCE_DIR}/src)
+target_link_libraries(physics_relativity_unit_tests PRIVATE Common GTest::gtest_main)
+target_compile_options(physics_relativity_unit_tests PRIVATE $<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra>)
+include(GoogleTest)
+gtest_discover_tests(physics_relativity_unit_tests)
