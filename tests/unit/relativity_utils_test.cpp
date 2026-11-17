@@ -1,14 +1,14 @@
-#include "components/RelativityState.hpp"
 #include "utils/RelativityUtils.hpp"
 
 #include <cmath>
 #include <gtest/gtest.h>
 #include <limits>
+#include <utils/physicalConstants.hpp>
 
 namespace {
     using namespace physics::utils;
-    constexpr double c = physics::RelativisticState::SPEED_OF_LIGHT;
-    constexpr RelativeVelocity vx{0.5 * c, 0.0, 0.0};
+    constexpr double SPEED_OF_LIGHT = common::constants::SPEED_OF_LIGHT;
+    constexpr RelativeVelocity vx{0.5 * SPEED_OF_LIGHT, 0.0, 0.0};
     constexpr SpacetimeEvent event{2.0, 1000.0, 200.0, -50.0};
     double interval(const SpacetimeEvent& e)
     {
@@ -20,15 +20,17 @@ TEST(Relativity, LorentzFactorRejectsNonSubluminalAndNonFiniteSpeeds)
 {
     EXPECT_DOUBLE_EQ(*lorentzFactor({0, 0, 0}), 1.0);
     EXPECT_NEAR(*lorentzFactor(vx), 1.0 / std::sqrt(0.75), 1e-15);
-    EXPECT_EQ(lorentzFactor({c, 0, 0}).error(), LorentzTransformError::SPEED_NOT_SUBLUMINAL);
+    EXPECT_EQ(lorentzFactor({SPEED_OF_LIGHT, 0, 0}).error(), LorentzTransformError::SPEED_NOT_SUBLUMINAL);
     EXPECT_EQ(lorentzFactor({std::numeric_limits<double>::infinity(), 0, 0}).error(),
               LorentzTransformError::NON_FINITE_INPUT);
 }
 
 TEST(Relativity, BoostsAlongEachAxisPreserveMinkowskiInterval)
 {
-    for (const RelativeVelocity boost :
-         {RelativeVelocity{0.4 * c, 0, 0}, {0, -0.4 * c, 0}, {0, 0, 0.4 * c}, {0.2 * c, 0.2 * c, 0.2 * c}}) {
+    for (const RelativeVelocity boost : {RelativeVelocity{0.4 * SPEED_OF_LIGHT, 0, 0},
+                                         {0, -0.4 * SPEED_OF_LIGHT, 0},
+                                         {0, 0, 0.4 * SPEED_OF_LIGHT},
+                                         {0.2 * SPEED_OF_LIGHT, 0.2 * SPEED_OF_LIGHT, 0.2 * SPEED_OF_LIGHT}}) {
         auto transformed = transformToMovingFrame(event, boost);
         ASSERT_TRUE(transformed);
         EXPECT_NEAR(interval(*transformed), interval(event), std::abs(interval(event)) * 1e-12 + 1e-5);
@@ -37,7 +39,7 @@ TEST(Relativity, BoostsAlongEachAxisPreserveMinkowskiInterval)
 
 TEST(Relativity, InverseBoostReturnsOriginalEvent)
 {
-    const RelativeVelocity boost{0.2 * c, -0.1 * c, 0.05 * c};
+    const RelativeVelocity boost{0.2 * SPEED_OF_LIGHT, -0.1 * SPEED_OF_LIGHT, 0.05 * SPEED_OF_LIGHT};
     auto transformed = transformToMovingFrame(event, boost);
     ASSERT_TRUE(transformed);
     auto restored = transformFromMovingFrame(*transformed, boost);
@@ -58,16 +60,18 @@ TEST(Relativity, SpatialRotationPreservesIntervalAndTime)
 
 TEST(Relativity, VelocityCompositionStaysSubluminalAndHandlesCollinearCase)
 {
-    auto composed = transformVelocityToMovingFrame({0.5 * c, 0, 0}, {0.5 * c, 0, 0});
+    auto composed = transformVelocityToMovingFrame({0.5 * SPEED_OF_LIGHT, 0, 0}, {0.5 * SPEED_OF_LIGHT, 0, 0});
     ASSERT_TRUE(composed);
     EXPECT_NEAR(composed->x, 0.0, 1e-10);
-    EXPECT_LT(speedMagnitude(*composed), c);
-    EXPECT_EQ(transformVelocityToMovingFrame({c, 0, 0}, vx).error(), LorentzTransformError::SPEED_NOT_SUBLUMINAL);
+    EXPECT_LT(speedMagnitude(*composed), SPEED_OF_LIGHT);
+    EXPECT_EQ(transformVelocityToMovingFrame({SPEED_OF_LIGHT, 0, 0}, vx).error(),
+              LorentzTransformError::SPEED_NOT_SUBLUMINAL);
 }
 
 TEST(Relativity, InvalidEventAndFrameAreRejected)
 {
     EXPECT_EQ(transformToMovingFrame({std::numeric_limits<double>::quiet_NaN(), 0, 0, 0}, vx).error(),
               LorentzTransformError::NON_FINITE_INPUT);
-    EXPECT_EQ(transformToMovingFrame(event, {c, 0, 0}).error(), LorentzTransformError::SPEED_NOT_SUBLUMINAL);
+    EXPECT_EQ(transformToMovingFrame(event, {SPEED_OF_LIGHT, 0, 0}).error(),
+              LorentzTransformError::SPEED_NOT_SUBLUMINAL);
 }

@@ -1,7 +1,9 @@
 #include "RelativityUtils.hpp"
-#include "components/RelativityState.hpp"
+#include <utils/physicalConstants.hpp>
 
 #include <cmath>
+
+using common::constants::SPEED_OF_LIGHT;
 
 namespace {
 
@@ -12,20 +14,22 @@ namespace {
 
     [[nodiscard]] long double speedOfLight()
     {
-        return static_cast<long double>(physics::RelativisticState::SPEED_OF_LIGHT);
+        return static_cast<long double>(SPEED_OF_LIGHT);
     }
 
 } // namespace
 
-double physics::utils::properTime(double coordinateTime, double speed)
+std::expected<double, physics::utils::LorentzTransformError> physics::utils::properTime(double coordinateTime,
+                                                                                        double speed)
 {
-    return coordinateTime / RelativisticState::lorentzFactorFor(speed, 0.0, 0.0);
+    return lorentzFactor({speed, 0.0, 0.0})
+        .transform([coordinateTime](double factor) { return coordinateTime / factor; });
 }
 
 double physics::utils::minkowskiIntervalSquared(double deltaTime, double deltaX, double deltaY, double deltaZ)
 {
-    const double cDeltaTime = RelativisticState::SPEED_OF_LIGHT * deltaTime;
-    return cDeltaTime * cDeltaTime - deltaX * deltaX - deltaY * deltaY - deltaZ * deltaZ;
+    const double lightTravelDistance = SPEED_OF_LIGHT * deltaTime;
+    return lightTravelDistance * lightTravelDistance - deltaX * deltaX - deltaY * deltaY - deltaZ * deltaZ;
 }
 
 double physics::utils::speedMagnitude(const RelativeVelocity& velocity) noexcept
@@ -40,11 +44,10 @@ physics::utils::lorentzFactor(const RelativeVelocity& velocity)
         return std::unexpected(LorentzTransformError::NON_FINITE_INPUT);
 
     const double speed = speedMagnitude(velocity);
-    const double c = RelativisticState::SPEED_OF_LIGHT;
-    if (!std::isfinite(speed) || speed >= c)
+    if (!std::isfinite(speed) || speed >= SPEED_OF_LIGHT)
         return std::unexpected(LorentzTransformError::SPEED_NOT_SUBLUMINAL);
 
-    const double beta = speed / c;
+    const double beta = speed / SPEED_OF_LIGHT;
     return 1.0 / std::sqrt((1.0 - beta) * (1.0 + beta));
 }
 
@@ -58,7 +61,7 @@ physics::utils::transformVelocityToMovingFrame(const RelativeVelocity& velocity,
     if (!isFinite(velocity))
         return std::unexpected(LorentzTransformError::NON_FINITE_INPUT);
     const double objectSpeed = speedMagnitude(velocity);
-    if (!std::isfinite(objectSpeed) || objectSpeed >= RelativisticState::SPEED_OF_LIGHT)
+    if (!std::isfinite(objectSpeed) || objectSpeed >= SPEED_OF_LIGHT)
         return std::unexpected(LorentzTransformError::SPEED_NOT_SUBLUMINAL);
 
     const long double c = speedOfLight();
@@ -90,8 +93,8 @@ physics::utils::transformVelocityToMovingFrame(const RelativeVelocity& velocity,
 
     // Rounding can put a mathematically subluminal result one ULP at or above c.
     const double resultSpeed = speedMagnitude(result);
-    if (resultSpeed >= RelativisticState::SPEED_OF_LIGHT) {
-        const double largestRepresentableSubluminalSpeed = std::nextafter(RelativisticState::SPEED_OF_LIGHT, 0.0);
+    if (resultSpeed >= SPEED_OF_LIGHT) {
+        const double largestRepresentableSubluminalSpeed = std::nextafter(SPEED_OF_LIGHT, 0.0);
         const double scale = largestRepresentableSubluminalSpeed / resultSpeed;
         result.x *= scale;
         result.y *= scale;
@@ -109,8 +112,7 @@ physics::utils::transformToMovingFrame(const physics::utils::SpacetimeEvent& eve
         return std::unexpected(LorentzTransformError::NON_FINITE_INPUT);
 
     const double speed = speedMagnitude(frameVelocity);
-    const double c = RelativisticState::SPEED_OF_LIGHT;
-    if (!std::isfinite(speed) || speed >= c)
+    if (!std::isfinite(speed) || speed >= SPEED_OF_LIGHT)
         return std::unexpected(LorentzTransformError::SPEED_NOT_SUBLUMINAL);
     if (speed == 0.0)
         return event;

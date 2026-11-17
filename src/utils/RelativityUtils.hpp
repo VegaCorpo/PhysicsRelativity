@@ -3,8 +3,6 @@
 #include <expected>
 
 namespace physics::utils {
-    inline constexpr double GRAVITATIONAL_CONSTANT = 6.67430e-20; // km^3 kg^-1 s^-2
-
     /** @brief Spacetime event in the engine units: seconds and kilometres. */
     struct SpacetimeEvent {
             double time = 0.0;
@@ -35,8 +33,7 @@ namespace physics::utils {
     [[nodiscard]] std::expected<RelativeVelocity, LorentzTransformError>
     transformVelocityToMovingFrame(const RelativeVelocity& velocity, const RelativeVelocity& frameVelocity);
 
-    /** @brief Convert coordinate time to proper time for a constant speed (km/s). */
-    [[nodiscard]] double properTime(double coordinateTime, double speed);
+    [[nodiscard]] std::expected<double, LorentzTransformError> properTime(double coordinateTime, double speed);
 
     /** @brief Minkowski interval squared using the (+---) sign convention (km²). */
     [[nodiscard]] double minkowskiIntervalSquared(double deltaTime, double deltaX, double deltaY, double deltaZ);

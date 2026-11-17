@@ -47,7 +47,10 @@ endif()
 add_library(orbital_physics_relativity SHARED
     src/PhysicsAPI.cpp
     src/RelativityPhysics.cpp
-    src/integration/TimeStep.cpp
+    src/components/StateSynchronizer.cpp
+    src/forces/NewtonianField.cpp
+    src/integration/Rk4.cpp
+    src/kinematics/ProperTime.cpp
     src/utils/RelativityUtils.cpp
 )
 
